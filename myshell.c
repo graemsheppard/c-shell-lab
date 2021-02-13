@@ -174,6 +174,29 @@ int main(int argc, char *argv[])
             command_table_ptr++;
         };
 
+
+        // Treat as program invocation
+        if (command_handled == 0) {
+          pid_t pid = fork();
+          if (pid == 0) {
+            // Execute the program and return 0 if successful
+            exit(execvp(command, tokens));
+          } else {
+            int status;
+            // Wait for the child (pid) to terminate
+            waitpid(pid, &status, 0);
+
+            // Process exited normally
+            if (WIFEXITED(status)) {
+              // Get its exit code
+              int exit_status = WEXITSTATUS(status);
+              if (exit_status == 0) {
+                command_handled = 1;
+              }
+            }
+          }
+        }
+
         // Unsupported command
         if (command_handled == 0)
         {
