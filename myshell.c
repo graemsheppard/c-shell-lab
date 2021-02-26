@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
 
     FILE * input;
     char prompt;
+    FILE *fp;
 
     // Parse the commands provided using argc and argv
     if (argc == 1)
@@ -166,9 +167,33 @@ int main(int argc, char *argv[])
                 // Run the internal command
                 /**********************************************/
 		            /*WRITE YOUR CODE HERE*/
-                int exit_code = cmp_command.cmd_ptr(count, tokens);
-		            /**********************************************/
+		for (int i = 0; i < count; i++) {
+			if (strcmp(tokens[i], "<") == 0) {
+				// Next token is "<", so stdin needs to be redirected to that file.
+				// Check first if there's another element in the array, and if there is, handle it.
+				if (i+1 < count) {
+					fp = freopen(tokens[i+1], "r", stdin);
+				}
+			} else if (strcmp(tokens[i], ">") == 0) {
+				// Next token is ">", so stdin needs to be redirected to that file.
+				// Check first if there's another element in the array, and if there is, handl it.
+				if (i+1 < count) {
+					fp = freopen(tokens[i+1], "w", stdout);
+				}
+			} else if (strcmp(tokens[i], ">>") == 0) {
+				// Token is ">>". Handle as above.
+				if (i+1 < count) {
+					fp = freopen(tokens[i+1], "a", stdout);
+				}
+			}
+		}
 
+                int exit_code = cmp_command.cmd_ptr(count, tokens);
+		if (fp) {
+			fclose(fp);
+		}
+		            /**********************************************/
+		
                 last_exit = exit_code;
 
                 command_handled = 1;
@@ -192,8 +217,10 @@ int main(int argc, char *argv[])
             int status;
             // Wait for the child (pid) to terminate
 	    if (strcmp(tokens[count - 1], "&")) {
+		// Does not end with &
             	waitpid(pid, &status, 0);
 	    } else {
+		// Ends with &, so use WNOHANG to not stop parent execution
 		waitpid(pid, &status, WNOHANG);
 	    }
 
