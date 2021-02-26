@@ -16,7 +16,6 @@
 #include "internals.h"
 #include "myshell.h"
 #include "wait.h"
-
 // Put macros or constants here using #define
 
 
@@ -72,9 +71,11 @@ int main(int argc, char *argv[])
 
     int last_exit = 0;
     char* path = getcwd(0, 0);
-
-    strcat(path, "/myshell");
-    setenv("shell", path, 1);
+    char* shell_path = malloc(sizeof(char) * ((int)strlen(path) + 8));
+    strcpy(shell_path, path);
+    strcat(shell_path, "/myshell");
+    setenv("shell", shell_path, 1);
+    free(shell_path);
     // Add internal commands
     internals_add_all();
 
