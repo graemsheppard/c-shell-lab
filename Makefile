@@ -1,6 +1,6 @@
 CC = gcc
 
-CFLAGS = -Wall -Wextra -std=c99 -D_POSIX_SOURCE
+CFLAGS = -Wall -Wextra -std=c99 -D_POSIX_SOURCE=200112L
 
 
 LFLAGS =

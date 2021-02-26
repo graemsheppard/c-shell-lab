@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <string.h>
+#include <fcntl.h>
 #include "utility.h"
 #include "internals.h"
 #include "myshell.h"
@@ -77,10 +78,12 @@ int main(int argc, char *argv[])
     free(shell_path);
     // Add internal commands
     internals_add_all();
-
+    FILE *temp;
     FILE * input;
     char prompt;
-    FILE *fp;
+    FILE *fp = NULL;
+    int save_stdout;
+    int save_stdin;
     int file_out = 0;
     int file_in = 0;
 
@@ -162,6 +165,10 @@ int main(int argc, char *argv[])
         // Loop through internal commands
         command_t **command_table_ptr = internal_commands;
         while (*command_table_ptr != NULL) {
+	    int temp_out;
+	    int temp_in;
+	    fpos_t pos_in;
+	    fpos_t pos_out;
             command_t cmp_command = **command_table_ptr;
             if (strcmp(cmp_command.name, command) == 0)
             {
@@ -172,7 +179,9 @@ int main(int argc, char *argv[])
 			if (strcmp(tokens[i], "<") == 0) {
 				// Next token is "<", so stdin needs to be redirected to that file.
 				// Check first if there's another element in the array, and if there is, handle it.
-				if (i+1 < count) {
+				if (i+1 < count) 
+				{
+					save_stdin = dup(fileno(stdin));
 					fp = freopen(tokens[i+1], "r", stdin);
 					file_in = 1;
 				}
@@ -180,12 +189,14 @@ int main(int argc, char *argv[])
 				// Next token is ">", so stdin needs to be redirected to that file.
 				// Check first if there's another element in the array, and if there is, handl it.
 				if (i+1 < count) {
+					save_stdout = dup(fileno(stdout));
 					fp = freopen(tokens[i+1], "w", stdout);
 					file_out = 1;
 				}
 			} else if (strcmp(tokens[i], ">>") == 0) {
 				// Token is ">>". Handle as above.
 				if (i+1 < count) {
+					save_stdout = dup(fileno(stdout));
 					fp = freopen(tokens[i+1], "a", stdout);
 					file_out = 1;
 				}
@@ -193,16 +204,16 @@ int main(int argc, char *argv[])
 		}
 
                 int exit_code = cmp_command.cmd_ptr(count, tokens);
-		
+			
 		if (file_in == 1) {
 			fflush(stdin);
 			fclose(stdin);
-			stdin = fdopen(0, "r");
+			stdin = fdopen(save_stdin, "r");
 			file_in = 0;
 		} else if (file_out == 1) {
 			fflush(stdout);
 			fclose(stdout);
-			stdout = fdopen(1, "w");
+			stdout = fdopen(save_stdout, "w");
 			file_out = 0;
 		}
 
