@@ -18,7 +18,6 @@
 
 // Put macros or constants here using #define
 
-
 // Define some colour values
 #define COL_SEP "\x1B[37;1m" // Separator colour (in prompt)
 #define COL_YAY "\x1B[32;1m" // Success colour
@@ -77,6 +76,8 @@ int main(int argc, char *argv[])
     FILE * input;
     char prompt;
     FILE *fp;
+    int file_out = 0;
+    int file_in = 0;
 
     // Parse the commands provided using argc and argv
     if (argc == 1)
@@ -168,25 +169,39 @@ int main(int argc, char *argv[])
 				// Check first if there's another element in the array, and if there is, handle it.
 				if (i+1 < count) {
 					fp = freopen(tokens[i+1], "r", stdin);
+					file_in = 1;
 				}
 			} else if (strcmp(tokens[i], ">") == 0) {
 				// Next token is ">", so stdin needs to be redirected to that file.
 				// Check first if there's another element in the array, and if there is, handl it.
 				if (i+1 < count) {
 					fp = freopen(tokens[i+1], "w", stdout);
+					file_out = 1;
 				}
 			} else if (strcmp(tokens[i], ">>") == 0) {
 				// Token is ">>". Handle as above.
 				if (i+1 < count) {
 					fp = freopen(tokens[i+1], "a", stdout);
+					file_out = 1;
 				}
 			}
 		}
 
                 int exit_code = cmp_command.cmd_ptr(count, tokens);
-		if (fp) {
-			fclose(fp);
+		
+		if (file_in == 1) {
+			fflush(stdin);
+			fclose(stdin);
+			stdin = fdopen(0, "r");
+			file_in = 0;
+		} else if (file_out == 1) {
+			fflush(stdout);
+			fclose(stdout);
+			stdout = fdopen(1, "w");
+			file_out = 0;
 		}
+
+
 		            /**********************************************/
 		
                 last_exit = exit_code;
