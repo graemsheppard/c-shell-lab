@@ -5,6 +5,7 @@
  * All rights reserved.
  *
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -15,7 +16,6 @@
 #include "internals.h"
 #include "myshell.h"
 #include "wait.h"
-
 // Put macros or constants here using #define
 
 // Define some colour values
@@ -68,8 +68,13 @@ int main(int argc, char *argv[])
     char command[BUFFER_LEN] = { 0 };
     char arg[BUFFER_LEN] = { 0 };
 
-    int last_exit = 0;;
-
+    int last_exit = 0;
+    char* path = getcwd(0, 0);
+    char* shell_path = malloc(sizeof(char) * ((int)strlen(path) + 8));
+    strcpy(shell_path, path);
+    strcat(shell_path, "/myshell");
+    setenv("shell", shell_path, 1);
+    free(shell_path);
     // Add internal commands
     internals_add_all();
 
@@ -219,8 +224,10 @@ int main(int argc, char *argv[])
         if (command_handled == 0) {
           pid_t pid = fork();
           if (pid == 0) {
+            // sets the parent to the shell variable
+            setenv("parent", getenv("shell"), 1);
             // Execute the program and return 0 if successful
-            exit(execvp(command, tokens));
+            exit(execve(command, tokens, environ)); // pass in the current environ
           } else {
             int status;
             // Wait for the child (pid) to terminate
