@@ -1,5 +1,8 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99 -D_POSIX_C_SOURCE=200112L
+
+CFLAGS = -Wall -Wextra -std=c99 -D_POSIX_SOURCE
+
+
 LFLAGS =
 LIBS = -lm
 SOURCES = myshell.c utility.c internals.c
