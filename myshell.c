@@ -161,7 +161,6 @@ int main(int argc, char *argv[])
                 // Run the internal command
                 /**********************************************/
 		            /*WRITE YOUR CODE HERE*/
-
                 int exit_code = cmp_command.cmd_ptr(count, tokens);
 		            /**********************************************/
 
@@ -185,7 +184,11 @@ int main(int argc, char *argv[])
           } else {
             int status;
             // Wait for the child (pid) to terminate
-            waitpid(pid, &status, 0);
+	    if (strcmp(tokens[count - 1], "&")) {
+            	waitpid(pid, &status, 0);
+	    } else {
+		waitpid(pid, &status, WNOHANG);
+	    }
 
             // Process exited normally
             if (WIFEXITED(status)) {
