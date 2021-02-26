@@ -26,7 +26,6 @@
 #define COL_NON "\x1B[0m"    // Reset all attributes
 
 // Put global environment variables here
-FILE *fp;
 
 // Define functions declared in myshell.h here
 void split_string(char *buffer, char ***tokens_ptr, int *tokens_size)
@@ -77,6 +76,7 @@ int main(int argc, char *argv[])
 
     FILE * input;
     char prompt;
+    FILE *fp;
 
     // Parse the commands provided using argc and argv
     if (argc == 1)
@@ -184,8 +184,11 @@ int main(int argc, char *argv[])
 		}
 
                 int exit_code = cmp_command.cmd_ptr(count, tokens);
+		if (fp) {
+			fclose(fp);
+		}
 		            /**********************************************/
-
+		
                 last_exit = exit_code;
 
                 command_handled = 1;
