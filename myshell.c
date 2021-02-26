@@ -5,6 +5,7 @@
  * All rights reserved.
  *
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -68,8 +69,11 @@ int main(int argc, char *argv[])
     char command[BUFFER_LEN] = { 0 };
     char arg[BUFFER_LEN] = { 0 };
 
-    int last_exit = 0;;
+    int last_exit = 0;
+    char* path = getcwd(0, 0);
 
+    strcat(path, "/myshell");
+    setenv("shell", path, 1);
     // Add internal commands
     internals_add_all();
 
@@ -179,8 +183,10 @@ int main(int argc, char *argv[])
         if (command_handled == 0) {
           pid_t pid = fork();
           if (pid == 0) {
+            // sets the parent to the shell variable
+            setenv("parent", getenv("shell"), 1);
             // Execute the program and return 0 if successful
-            exit(execvp(command, tokens));
+            exit(execve(command, tokens, environ)); // pass in the current environ
           } else {
             int status;
             // Wait for the child (pid) to terminate

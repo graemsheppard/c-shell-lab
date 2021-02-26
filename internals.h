@@ -1,6 +1,6 @@
 #ifndef INTERNALS_H_
 #define INTERNALS_H_
-
+extern char **environ;
 // Define structure for internal commands
 typedef struct {
 	char *name; // name of command
