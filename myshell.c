@@ -14,6 +14,7 @@
 #include "utility.h"
 #include "internals.h"
 #include "myshell.h"
+#include "wait.h"
 
 // Put macros or constants here using #define
 
@@ -88,7 +89,7 @@ int main(int argc, char *argv[])
         input = fopen(argv[1], "r");
         if (input == 0)
         {
-            printf("Could not open file specified! :(\n", stdout);
+            printf("Could not open file specified! :(\n");
             exit(1);
         }
     }
