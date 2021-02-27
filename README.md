@@ -1,3 +1,6 @@
+myshell shell
+By Nick Lang and Graem Sheppard
+
 Description
 myshell is a simple C shell intended to learn about low-level process management and io. It supports a variety of system management functionality taken from either command-line or shell script files. It is written in C and intended for use on Unix distributions.
 
