@@ -78,15 +78,13 @@ int main(int argc, char *argv[])
     free(shell_path);
     // Add internal commands
     internals_add_all();
-    FILE *temp;
     FILE * input;
     char prompt;
     FILE *fp = NULL;
     int save_stdout;
     int save_stdin;
-    int file_out = 0;
-    int file_in = 0;
-
+    int file_in;
+    int file_out;
     // Parse the commands provided using argc and argv
     if (argc == 1)
     {
@@ -165,10 +163,6 @@ int main(int argc, char *argv[])
         // Loop through internal commands
         command_t **command_table_ptr = internal_commands;
         while (*command_table_ptr != NULL) {
-	    int temp_out;
-	    int temp_in;
-	    fpos_t pos_in;
-	    fpos_t pos_out;
             command_t cmp_command = **command_table_ptr;
             if (strcmp(cmp_command.name, command) == 0)
             {

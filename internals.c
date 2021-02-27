@@ -54,16 +54,10 @@ int internal_cmd_ls(int argc, char *argv[])
 
 	DIR *dirptr;
 	struct dirent *item;
-	char dir_str[BUFFER_LEN] = ".";
-	// Append the specified path to working directory
-	if (argv[1] != NULL) {
-		strcat (dir_str, "/");
-		strcat (dir_str, argv[1]);
-	}
 
 
 	// Open directory
-	dirptr = opendir(dir_str);
+	dirptr = opendir(getcwd(0, 0));
 
 	// Return error if dp is dull
 	if (dirptr == NULL) return 1;
